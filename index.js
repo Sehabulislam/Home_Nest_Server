@@ -44,18 +44,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-    app.post("/allProperties", async (req, res) => {
-      const newProperties = req.body;
-      const result = await propertiesCollection.insertOne(newProperties);
-      res.send(result);
-    });
-    app.get("/propertyDetails/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await propertiesCollection.findOne(query);
-      res.send(result);
-    });
-
+    
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
