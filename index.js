@@ -29,13 +29,15 @@ async function run() {
 
     const homeNestDB = client.db("homeNestDB");
     const propertiesCollection = homeNestDB.collection("allProperties");
+    const ratingsCollection = homeNestDB.collection("allRatings");
 
-    //properties related api
+    // get
     app.get("/allProperties", async (req, res) => {
       const cursor = propertiesCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
+    // get 6
     app.get("/featuredProperties", async (req, res) => {
       const cursor = propertiesCollection
         .find()
@@ -44,19 +46,22 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    // post
     app.post("/allProperties", async (req, res) => {
       const newProperties = req.body;
       const result = await propertiesCollection.insertOne(newProperties);
       res.send(result);
     });
+    // single get
     app.get("/propertyDetails/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await propertiesCollection.findOne(query);
       res.send(result);
     });
+    // my pro get
     app.get("/myProperties", async (req, res) => {
-      const email = req.query.email
+      const email = req.query.email;
       const query = {};
       if (email) {
         query.seller_Email = email;
@@ -65,7 +70,14 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-    app.patch("/myProperty/:id", async (req, res) => {
+    app.get("/updateProperty/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await propertiesCollection.findOne(query);
+      res.send(result);
+    });
+    // update
+    app.put("/myProperties/:id", async (req, res) => {
       const id = req.params.id;
       const updateProperty = req.body;
       const query = { _id: new ObjectId(id) };
@@ -87,10 +99,26 @@ async function run() {
       );
       res.send(result);
     });
-        app.delete("/myProperties/:id", async (req, res) => {
+    // delete
+    app.delete("/myProperties/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await propertiesCollection.deleteOne(query);
+      res.send(result);
+    });
+    app.get("/myRatings", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.reviewer_Email = email;
+      }
+      const cursor = ratingsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    app.post("/myRatings", async (req, res) => {
+      const newRating = req.body;
+      const result = await ratingsCollection.insertOne(newRating);
       res.send(result);
     });
     await client.db("admin").command({ ping: 1 });
